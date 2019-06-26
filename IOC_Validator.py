@@ -10,6 +10,61 @@
 import requests
 import html2text
 import re
+import socket 
+import sys
+import validators
+import subprocess
+from bs4 import BeautifulSoup
+from lxml import html
+
+def is_site_alive(url):
+    request = requests.get(url)
+    if request.status_code == 200:
+        return True 
+    else:
+        return False 
+
+def is_ip_address(ip):
+    try:
+        print(socket.inet_aton(ip))
+        return True 
+    except socket.error:
+        return False
+
+
+def is_domain(domain_name):
+    if validators.domain(domain_name):
+        return True
+    else:
+        return False
+
+
+def is_url(url):
+    if validators.url(url):
+        return True 
+    else:
+        return False
+
+def detect_hash(hash_code):
+    hash_decode = 'python hash-id.py ' + hash_code
+    p = subprocess.Popen(hash_decode, stdout=subprocess.PIPE, shell=True)
+    out, err = p.communicate() 
+    output = out.decode("utf-8")
+    if 'Possible Hashs' in output:
+        return output.split(" ")[2][:-5]
+    else:
+        return False 
+
+
+def detectJS(data):
+    re_js = '(^{)|(}$)|(function(.*)\(\)(.*\s*){)|(for(.*)\((.*\s*)\)(\s*){)|(=+(.*\s*)=+(.*\s*)=)|(!+(.*\s*)!+(.*\s*)!)|(\++(.*\s*)\++(.*\s*)\+)|(:+(.*\s*):+(.*\s*):+(.*\s*):+(.*\s*):+(.*\s*))|(\(+(.*\s*)\);)|(&&)'
+    x = re.search(re_js, data)
+    if x:
+        return True
+    else:
+        return False
+
+
 
 h = html2text.HTML2Text()
 h.ignore_links = True
@@ -20,6 +75,10 @@ f = requests.get(link)
 REG_File = open("reg_key.txt", "w+")
 File_name = open("fileName.txt", "w+")
 File_path = open("filePath.txt", "w+")
+ip_address = open("ip_address.txt", "w+")
+domain_name = open("domain_name.txt", "w+")
+url_file = open("url.txt", "w+")
+hash_file = open("hash.txt", "w+") 
 
 fulltext = f.text
 contentFromURL = h.handle(fulltext)
@@ -27,7 +86,15 @@ contentFromURL = h.handle(fulltext)
 for line in contentFromURL.splitlines():
     splittelLine = line.split(" ")
     for splitted in splittelLine:
-        if splitted.startswith(keyTuple):
+        if (is_ip_address(splitted)):
+            ip_address.write("%s\n" %splitted)
+        elif(is_domain(splitted)):
+            domain_name.write("%s\n" %splitted)
+        elif(is_url(splitted)):
+            url_file.write("%s\n" %splitted)
+        elif(detect_hash(splitted)):
+            hash_file.write("%s\n" %splitted)
+        elif splitted.startswith(keyTuple):
             print("REGISTRY KEY: " + splitted)
             REG_File.write("%s\n" %(splitted))
         elif splitted.endswith(fileExtension):
@@ -43,6 +110,10 @@ for line in contentFromURL.splitlines():
 REG_File.close()
 File_name.close()
 File_path.close()
+ip_address.close()
+domain_name.close()
+url_file.close()
+hash_file.close()
 
 #root, ext = os.path.splitext(path) --> check for extension
 # ip_candidates = re.findall(r'\bHKLM:\w+', contentFromURL)
