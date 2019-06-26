@@ -73,7 +73,7 @@ def detect_hash(hash_code):
     out, err = p.communicate() 
     output = out.decode("utf-8")
     if 'Possible Hashs' in output:
-        return output.split(" ")[2][:-5]
+        return (hash_code + ":" + output.split(" ")[2][:-5])
     else:
         return False 
 

@@ -1,36 +1,29 @@
-#File name
-#Registry --> HKLM, HKCR, HKCU,HKCC,HK_Users
-#File Path --> check by /
-#Process Name --> .exe
-#backdoor name?
-# Check if URL is valid by response code 
-#Parse text from URL (Do separately then compare efficiency)
-#IP address: r"\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b"
+# File name
+# Registry --> HKLM, HKCR, HKCU,HKCC,HK_Users
+# File Path --> check by /
+# Process Name --> .exe
+# backdoor name?
+# Check if URL is valid by response code
+# Parse text from URL (Do separately then compare efficiency)
+# IP address: r"\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b"
+# URl: re.findall('https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+', url)
 
 import requests
-import html2text
 import re
-import socket 
+import socket
 import sys
 import validators
 import subprocess
 from bs4 import BeautifulSoup
 from lxml import html
 
+
 def is_site_alive(url):
     request = requests.get(url)
     if request.status_code == 200:
-        return True 
+        return request
     else:
-        return False 
-
-def is_ip_address(ip):
-    try:
-        print(socket.inet_aton(ip))
-        return True 
-    except socket.error:
-        return False
-
+        return "False"
 
 def is_domain(domain_name):
     if validators.domain(domain_name):
@@ -38,84 +31,91 @@ def is_domain(domain_name):
     else:
         return False
 
-
-def is_url(url):
-    if validators.url(url):
-        return True 
-    else:
-        return False
-
 def detect_hash(hash_code):
     hash_decode = 'python hash-id.py ' + hash_code
     p = subprocess.Popen(hash_decode, stdout=subprocess.PIPE, shell=True)
-    out, err = p.communicate() 
+    out, err = p.communicate()
     output = out.decode("utf-8")
     if 'Possible Hashs' in output:
-        return output.split(" ")[2][:-5]
-    else:
-        return False 
-
-
-def detectJS(data):
-    re_js = '(^{)|(}$)|(function(.*)\(\)(.*\s*){)|(for(.*)\((.*\s*)\)(\s*){)|(=+(.*\s*)=+(.*\s*)=)|(!+(.*\s*)!+(.*\s*)!)|(\++(.*\s*)\++(.*\s*)\+)|(:+(.*\s*):+(.*\s*):+(.*\s*):+(.*\s*):+(.*\s*))|(\(+(.*\s*)\);)|(&&)'
-    x = re.search(re_js, data)
-    if x:
-        return True
+        return (hash_code + ":" + output.split(" ")[2][:-5])
     else:
         return False
 
 
+def running(link):
+    keyTuple = ("HKLM:", "HKCU:", "**HKLM:", "**HKCU:")
+    fileExtension = (".ps1", ".doc", ".js", ".vbs", ".Vbs",
+                    ".ps1_", ".doc_", ".js_", ".vbs_", ".Vbs_")
+    f = is_site_alive(link)
+    if (f == "False"):
+        return False
+    REG_File = open("reg_key.txt", "w+")
+    File_name = open("fileName.txt", "w+")
+    File_path = open("filePath.txt", "w+")
+    ip_address = open("ip_address.txt", "w+")
+    domain_name = open("domain_name.txt", "w+")
+    url_file = open("url.txt", "w+")
+    hash_file = open("hash.txt", "w+")
+    count = 0
 
-h = html2text.HTML2Text()
-h.ignore_links = True
-keyTuple = ("HKLM", "HKCU", "**HKLM", "**HKCU")
-fileExtension = (".ps1", ".doc", ".js", ".vbs", ".Vbs", ".ps1_", ".doc_", ".js_", ".vbs_", ".Vbs_")
-link = "https://reaqta.com/2017/11/muddywater-apt-targeting-middle-east/"
-f = requests.get(link)
-REG_File = open("reg_key.txt", "w+")
-File_name = open("fileName.txt", "w+")
-File_path = open("filePath.txt", "w+")
-ip_address = open("ip_address.txt", "w+")
-domain_name = open("domain_name.txt", "w+")
-url_file = open("url.txt", "w+")
-hash_file = open("hash.txt", "w+") 
+    soup = BeautifulSoup(f.content)
+    # Splitting websites content by \n (line by line analysis)
+    [s.extract() for s in soup('style')]
+    [s.extract() for s in soup('script')]
+    filter_text = soup.get_text().split("\n")
+    print(soup.get_text())
+    domain_reg = r"[\[]*\.[\]]*([A-Z0-9-_]+)[\[]*\.[\]]*(XN--VERMGENSBERATUNG-PWB|XN--VERMGENSBERATER-CTB|XN--CLCHC0EA0B2G2A9GCD|TRAVELERSINSURANCE|XN--MGBERP4A5D4AR|XN--XKC2DL3A5EE0H|XN--XKC2AL3HYE2A|XN--KCRX77D1X4A|XN--MGBC0A9AZCG|SANDVIKCOROMANT|XN--I1B6B1A6A2E|XN--NQV7FS00EMA|XN--MGBA3A4F16A|XN--LGBBAT1AD8J|XN--MGBX4CD0AB|XN--MGBA3A3EJT|XN--FIQ228C5HS|XN--MGBBH1A71E|XN--B4W605FERD|XN--MGBAAM7A8H|XN--MGBAYH7GPA|XN--MGBB9FBPOB|XN--JLQ61U9W7B|CANCERRESEARCH|WEATHERCHANNEL|XN--6QQ986B3XL|XN--YGBI2AMMX|INTERNATIONAL|XN--FZC2C9E2C|LIFEINSURANCE|SPREADBETTING|XN--YFRO4I67O|XN--ECKVDTC9D|XN--FPCRJ9C3D|XN--MGBT3DHD|XN--QCKA1PMC|XN--3E0B707E|XN--MK1BU44C|XN--80ASEHDB|VERSICHERUNG|XN--NGBC5AZD|XN--NGBE9E0A|CONSTRUCTION|XN--OGBPF8FL|PAMPEREDCHEF|SCHOLARSHIPS|XN--MGB9AWBF|XN--MGBAB2BD|XN--MGBPL2FH|XN--80ADXHKS|XN--42C2D9A|XN--G2XX48C|XN--KPRW13D|XN--ZFR164B|XN--CZR694B|XN--KPRY57D|REDUMBRELLA|XN--EFVY88H|CREDITUNION|XN--3DS443G|LAMBORGHINI|XN--GECRJ9C|BRIDGESTONE|XN--80AO21A|BARCLAYCARD|XN--H2BRJ9C|XN--T60B56A|XN--SES554G|XN--3BST00M|XN--1QQW23A|XN--HXT814E|XN--6FRZ82G|XN--11B4C3D|XN--S9BRJ9C|XN--RHQV96G|XN--D1ACJ3B|XN--IMR513N|XN--Q9JYB4C|XN--MGBTX2B|PRODUCTIONS|XN--FJQ720A|XN--FLW351E|INVESTMENTS|XN--J6W193G|XN--XHQ521B|XN--55QW42G|PLAYSTATION|WILLIAMHILL|PHOTOGRAPHY|CONTRACTORS|ACCOUNTANTS|MOTORCYCLES|XN--VUQ861B|XN--PGBS0DH|XN--ESTV75G|XN--PBT977C|ENTERPRISES|XN--NYQY26A|ENGINEERING|BLACKFRIDAY|XN--45BRJ9C|XN--KPU716F|VOLKSWAGEN|VISTAPRINT|ACCOUNTANT|TELEFONICA|XN--O3CW4H|TECHNOLOGY|TATAMOTORS|XN--FIQ64B|XN--FIQS8S|XN--FIQZ9S|XN--CZRU2D|XN--PSSY2U|XN--CZRS0T|XN--CG4BKI|IMMOBILIEN|XN--C2BR7G|INDUSTRIES|APARTMENTS|XN--IO0A7I|ASSOCIATES|FOUNDATION|XN--9ET52U|CONSULTING|XN--9DBQ2A|XN--90A3AC|XN--KPUT3I|XN--80ASWG|CREDITCARD|XN--Y9A3AQ|XN--55QX5D|CUISINELLA|XN--MXTQ1M|EUROVISION|XN--4GBRIM|PROPERTIES|XN--WGBL6A|XN--WGBH1C|VLAANDEREN|RESTAURANT|XN--45Q11C|MANAGEMENT|REPUBLICAN|BNPPARIBAS|XN--UNUP4Y|XN--3PXU8K|BOEHRINGER|UNIVERSITY|XN--30RR7Y|PROTECTION|HEALTHCARE|SCHAEFFLER|CHRISTMAS|LANDROVER|LANCASTER|XN--TCKWE|LIFESTYLE|EDUCATION|BLOOMBERG|MARKETING|XN--VHQUV|EQUIPMENT|MELBOURNE|XN--L1ACC|ACCENTURE|FAIRWINDS|BARCELONA|TRAVELERS|MICROSOFT|XN--90AIS|FINANCIAL|FIRESTONE|DIRECTORY|FRESENIUS|FURNITURE|XN--C1AVG|SOLUTIONS|XN--J1AMH|STATEFARM|XN--J1AEF|INSURANCE|AQUARELLE|INSTITUTE|COMMUNITY|YODOBASHI|ANALYTICS|AMSTERDAM|STOCKHOLM|XN--NQV7F|ALLFINANZ|GOLDPOINT|XN--D1ALF|HOMEDEPOT|XN--P1ACF|XN--FHBEI|MONTBLANC|VACATIONS|DISCOUNT|PLUMBING|DIAMONDS|LIGHTING|BUSINESS|FIRMDALE|ISTANBUL|SECURITY|SERVICES|DELOITTE|FEEDBACK|ATTORNEY|FOOTBALL|PHARMACY|PARTNERS|PROPERTY|MORTGAGE|BROADWAY|SOFTBANK|BRADESCO|IPIRANGA|SOFTWARE|ENGINEER|MARRIOTT|BUDAPEST|DOWNLOAD|SAARLAND|COMPUTER|XN--QXAM|DEMOCRAT|STCGROUP|MEMORIAL|VENTURES|PICTURES|INFINITI|COMMBANK|CATERING|MOVISTAR|VERISIGN|XN--NODE|EVERBANK|EXCHANGE|SUPPLIES|CAPETOWN|BOUTIQUE|BARGAINS|XN--P1AI|BUILDERS|YOKOHAMA|AIRFORCE|SYMANTEC|GRAINGER|GRAPHICS|BARCLAYS|CLOTHING|CLINIQUE|MUTUELLE|HOLDINGS|CLEANING|REDSTONE|CITYEATS|CIPRIANI|DELIVERY|HELSINKI|FLSMIDTH|BRUSSELS|TRAINING|REVIEWS|COMPANY|COMPARE|SHIKSHA|TRADING|THEATER|TIFFANY|ABOGADO|KITCHEN|CONTACT|CAPITAL|COOKING|EXPOSED|EXPRESS|WHOSWHO|CARAVAN|CORSICA|COUNTRY|COUPONS|COURSES|ANDROID|FASHION|JEWELRY|SYSTEMS|FERRERO|ZUERICH|CAREERS|CRICKET|FINANCE|WINDOWS|CRUISES|YOUTUBE|CARTIER|FISHING|FITNESS|PHILIPS|RENTALS|FLIGHTS|FLORIST|FLOWERS|SCIENCE|STATOIL|THEATRE|RECIPES|ISELECT|PANERAI|FORSALE|REALTOR|MARKETS|YAMAXUN|SURGERY|FROGANS|BAUHAUS|LINCOLN|KOMATSU|LIMITED|GALLERY|CHANNEL|ORGANIC|OKINAWA|SCHWARZ|STARHUB|LIAISON|TICKETS|GENTING|SPIEGEL|DENTIST|LECLERC|BROTHER|ALIBABA|NEUSTAR|DIGITAL|LATROBE|NETWORK|NETBANK|WANGGOU|SCHMIDT|SUPPORT|BENTLEY|LASALLE|LANXESS|HYUNDAI|DOMAINS|WATCHES|BUGATTI|HOTMAIL|WEATHER|TEMASEK|LACAIXA|ACADEMY|STORAGE|HOTELES|HOSTING|AUCTION|HOLIDAY|WEBSITE|CLUBMED|TOSHIBA|SANDVIK|SINGLES|WEDDING|GUITARS|SAMSUNG|SHRIRAM|COLLEGE|HAMBURG|HANGOUT|HITACHI|COLOGNE|REXROTH|ORIGINS|HEALTH|HIPHOP|TIENDA|HOCKEY|TENNIS|TATTOO|TAOBAO|TAIPEI|AGENCY|SYDNEY|SWATCH|GRATIS|GOOGLE|SUZUKI|ABBOTT|AIRTEL|ALIPAY|SUPPLY|GLOBAL|ALSACE|GIVING|STUDIO|YANDEX|INSURE|GARDEN|FUTBOL|ARAMCO|YACHTS|SOCIAL|SOCCER|JAGUAR|TOYOTA|JOBURG|FAMILY|JUEGOS|KAUFEN|AUTHOR|EXPERT|KINDER|EVENTS|ESTATE|XPERIA|SELECT|ENERGY|EMERCK|TRAVEL|BAYERN|SCHULE|SCHOOL|DURBAN|BERLIN|SANOFI|BHARTI|DOOSAN|DIRECT|LAWYER|DESIGN|SAKURA|SAFETY|RYUKYU|DENTAL|ROCHER|DEGREE|REVIEW|DEALER|REPORT|LIVING|REPAIR|DATSUN|REISEN|LONDON|REALTY|BOSTIK|RACING|QUEBEC|LUXURY|BROKER|CAMERA|MADRID|MAISON|MAKEUP|DATING|VIAJES|MARKET|CAREER|PICTET|PIAGET|PHYSIO|PHOTOS|VILLAS|CREDIT|MOBILY|MONASH|CASINO|CONDOS|MORMON|COMSEC|MOSCOW|COFFEE|CENTER|VIRGIN|OTSUKA|CHANEL|WEBCAM|ORANGE|MUSEUM|CLINIC|ORACLE|CLAIMS|ONLINE|WALTER|VISION|NAGOYA|OFFICE|VOYAGE|HERMES|CHROME|CIRCLE|NOWRUZ|VOTING|NORTON|CHURCH|NISSAN|ACTIVE|SALON|NINJA|NIKON|NEXUS|CISCO|LEASE|CHLOE|VISTA|WALES|CHEAP|NADEX|OMEGA|WATCH|CLICK|CLOUD|WEBER|OSAKA|COACH|CODES|MOVIE|PARIS|MONEY|PARTS|PARTY|MIAMI|VIDEO|PHOTO|CROWN|CYMRU|MEDIA|DABUR|DANCE|PIZZA|MANGO|PLACE|CARDS|CANON|POKER|WORKS|PRAXI|PRESS|PROMO|BUILD|VEGAS|WORLD|LUPIN|XEROX|LOTTO|BOSCH|LOTTE|BOOTS|REHAB|REISE|LOANS|BOATS|LIXIL|LINDE|BLACK|DEALS|BINGO|RICOH|DELTA|ROCKS|RODEO|TUSHU|LEXUS|LEGAL|VODKA|NOKIA|BIBLE|DRIVE|LAMER|TRUST|DUBAI|BEATS|EARTH|KYOTO|EDEKA|EMAIL|BAIDU|EPSON|SENER|AZURE|SEVEN|KOELN|AUTOS|SHARP|SHELL|SHOES|FAITH|TRADE|AUDIO|JETZT|SKYPE|TOURS|SMILE|TORAY|FINAL|FOREX|IRISH|SOLAR|SPACE|TOOLS|STADA|ARCHI|FORUM|GIFTS|APPLE|AMICA|GIVES|STUDY|STYLE|TOKYO|SUCKS|GLASS|IINET|GLOBO|GMAIL|HOUSE|TODAY|GREEN|SWISS|TMALL|TIROL|HORSE|HONDA|TIRES|HOMES|GRIPE|TATAR|GROUP|ADULT|GUCCI|GUIDE|ACTOR|CITIC|VIVA|MODA|DOCS|FILM|PROD|CALL|PROF|IMMO|CAFE|BUZZ|DIET|FAST|VANA|FARM|QPON|DESI|FANS|JOBS|READ|LGBT|CLUB|GOOG|BOOK|BOND|HSBC|MTPC|LIDL|REIT|RENT|LIFE|DELL|JPRS|BLUE|REST|HAUS|LIKE|CITY|BING|RICH|WANG|GIFT|LIMO|DCLK|ROOM|NAME|RSVP|RUHR|TUBE|NAVY|BIKE|SAFE|KDDI|LINK|SALE|LIVE|INFO|FAIL|BEST|NEWS|SAPO|SARL|SAXO|FAGE|VOTO|BEER|LOAN|BBVA|VOTE|NICO|GGEE|BANK|SCOR|SCOT|BAND|GENT|SEAT|GOLF|SEEK|KIWI|LOVE|GBIZ|XBOX|SEXY|LTDA|ERNI|LUXE|GOLD|SHIA|AUTO|GAME|SHOW|ICBC|FUND|MAIF|SITE|TOYS|KRED|SKIN|HOST|TOWN|GURU|HELP|AUDI|SNCF|CHAT|FORD|DATE|ASIA|DVAG|SOHU|FISH|ARTE|SONY|PAGE|ARPA|ARMY|CERN|WORK|STAR|WINE|PARS|GUGE|MEET|CYOU|YOGA|MEME|ITAU|CASH|CASA|MENU|CARS|HERE|LAND|SURF|JAVA|PICS|MINI|COOP|PING|PINK|WIKI|WIEN|COOL|ZARA|PLAY|CARE|WEIR|ZERO|PLUS|MOBI|TAXI|TIPS|AERO|TEAM|TECH|CAMP|ADAC|ZONE|POHL|DOHA|PORN|POST|AARP|OVH|CRS|MTN|REN|DOG|MTR|CSC|CAT|AIG|GLE|LAT|IBM|LAW|CBA|ICE|ICU|RIO|RIP|UBS|LDS|CBN|BUY|IFM|AEG|NEC|TUI|NET|RUN|GMO|RWE|GMX|TRV|CEB|NEW|AXA|CEO|EAT|GOO|NGO|NHK|FIT|ING|SAP|INK|BOM|SAS|GOP|GOT|SBS|INT|SCA|SCB|GOV|DAD|EDU|XYZ|CFA|NRA|NRW|NTT|COM|NYC|LOL|OBI|CFD|FLY|DAY|IST|ONE|ONG|SEW|SEX|ONL|SFR|XIN|OOO|BOO|FOO|ORG|LTD|BZH|WTF|IWC|HOW|BBC|CAB|WTC|JCB|SKI|BID|SKY|CAL|ACO|JLC|JLL|VIP|PET|VIN|MAN|FOX|JMP|BCN|BOT|FRL|JOT|MBA|SOY|JOY|WME|ESQ|TOP|SRL|MED|PID|PIN|XXX|BIO|BIZ|STC|FYI|VET|ABB|MEN|KFH|MEO|GAL|WIN|EUS|CAR|MIL|KIA|KIM|DEV|HIV|MMA|PRO|AFL|ADS|BAR|GDN|AAA|MOE|TAB|MOI|MOM|GEA|PUB|KPN|TAX|UOL|UNO|TCI|APP|KRD|BMS|BMW|TEL|BET|MOV|BNL|FAN|RED|DNP|THD|WED|ZIP|KN|TH|TF|TD|TC|SZ|SY|TJ|TK|TL|TM|SX|TN|TO|SV|SU|ST|SR|SO|SN|SM|SL|SK|SJ|TR|SI|SH|SG|SE|SD|SC|SB|SA|TT|RW|RU|RS|TV|TW|TZ|ZW|RO|UG|UK|RE|QA|PY|US|UY|UZ|VA|PW|PT|VC|VE|PS|PR|PN|PM|PL|VG|VI|PK|PH|PG|PF|PE|PA|OM|NZ|NU|NR|NP|VN|NO|NL|NI|NG|NF|NE|VU|NC|NA|MZ|MY|MX|MW|MV|MU|MT|MS|MR|MQ|MP|MO|WF|MN|MM|ML|MK|MH|MG|ME|MD|MC|MA|LY|WS|LV|LU|LT|LS|LR|LK|LI|LC|LB|LA|KZ|KY|KW|KR|KP|TG|KM|KI|KH|KG|KE|JP|JO|JM|JE|IT|IS|IR|IQ|IO|IN|IM|IL|IE|ID|HU|HT|HR|HN|HM|HK|GY|GW|GU|GT|GS|GR|GQ|GP|GN|GM|GL|GI|GH|GG|GF|GE|GD|GB|GA|FR|FO|FM|FK|FJ|FI|EU|ET|ES|ER|EG|EE|EC|DZ|DO|DM|DK|DJ|DE|CZ|CY|CX|CW|CV|CU|CR|CO|CN|CM|CL|CK|CI|CH|CG|CF|CD|CC|CA|BZ|BY|BW|BV|BT|BS|BR|BO|BN|BM|BJ|BI|BH|BG|BF|BE|BD|BB|BA|AZ|AX|AW|AU|AT|AS|AR|AQ|YE|AO|AM|AL|AI|YT|ZA|AG|AF|AE|ZM|AD|AC|UA)"    
+    #read TLD from file 
 
-fulltext = f.text
-contentFromURL = h.handle(fulltext)
-#print(contentFromURL)
-for line in contentFromURL.splitlines():
-    splittelLine = line.split(" ")
-    for splitted in splittelLine:
-        if (is_ip_address(splitted)):
-            ip_address.write("%s\n" %splitted)
-        elif(is_domain(splitted)):
-            domain_name.write("%s\n" %splitted)
-        elif(is_url(splitted)):
-            url_file.write("%s\n" %splitted)
-        elif(detect_hash(splitted)):
-            hash_file.write("%s\n" %splitted)
-        elif splitted.startswith(keyTuple):
-            print("REGISTRY KEY: " + splitted)
-            REG_File.write("%s\n" %(splitted))
-        elif splitted.endswith(fileExtension):
-            if "\\" in splitted:
-                finalFile = splitted.split("\\")
-                print ("FileName " + finalFile[-1])
-                File_name.write("%s\n" %(finalFile[-1]))
-                File_path.write("%s\n" %(splitted))
-            else:
-                File_name.write("%s\n" %(splitted))
-            
+    for ft in range(len(filter_text)):
+        if filter_text[ft]==' ':  
+            filter_text[ft]=''
+        filter_text[ft] = filter_text[ft].replace('\t', '')
+        filter_text[ft] = filter_text[ft].replace('\r', '')
+        filter_text[ft] = filter_text[ft].replace('\xa0', '')
+    filter_text = list(filter(None, filter_text))
+    for filtered in filter_text:
+        splittelLine = filtered.split(" ")
+        for split in splittelLine:
+                #checkHash = str(detect_hash(split))
+            # elif(checkHash != "False"):
+            #     print(checkHash + "\n")
+            #     hash_file.write("%s\n" %checkHash)
+            if split.startswith(keyTuple):
+                # print("REGISTRY KEY: " + splitted)
+                REG_File.write("%s\n" %(split))
+            elif split.endswith(fileExtension):
+                if "\\" in split:
+                    finalFile = split.split("\\")
+                    # print ("FileName " + finalFile[-1])
+                    File_name.write("%s\n" %(finalFile[-1]))
+                    File_path.write("%s\n" %(split))
+                else:
+                    File_name.write("%s\n" %(split))
+            elif (re.search(domain_reg, split.upper())):
+                if ("http" in split or "https" in split):
+                    url_file.write("%s\n" %(split))
+                else:
+                    domain_name.write("%s\n" %(split))
+            count += 1
 
-REG_File.close()
-File_name.close()
-File_path.close()
-ip_address.close()
-domain_name.close()
-url_file.close()
-hash_file.close()
+    ip_candidates = re.findall(r"\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b",' '.join(filter_text))
+    if (len(ip_candidates) > 0):
+        ip_candidates = list(dict.fromkeys(ip_candidates))
+        for ip in ip_candidates:
+            ip_address.write("%s\n" %(ip))
 
-#root, ext = os.path.splitext(path) --> check for extension
-# ip_candidates = re.findall(r'\bHKLM:\w+', contentFromURL)
-#     # remove duplciated from list: (list(dict.fromkeys(ip_candidates))
-# print(list(dict.fromkeys(ip_candidates)))
+
+    REG_File.close()
+    File_name.close()
+    File_path.close()
+    ip_address.close()
+    domain_name.close()
+    url_file.close()
+    hash_file.close()
+
+
+link = input("Plese input URL for crawling: ")
+running(link)
+
+
