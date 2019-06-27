@@ -10,7 +10,7 @@ from nltk.corpus import wordnet
 
 keyTuple = ("HKLM:", "HKCU:", "**HKLM:", "**HKCU:")
 fileExtension = (".ps1", ".doc", ".js", ".vbs", ".Vbs",
-                    ".ps1_", ".doc_", ".js_", ".vbs_", ".Vbs_")
+                    ".ps1_", ".doc_", ".js_", ".vbs_", ".Vbs_", ".py", ".exe")
 REG_array = []
 fileName_List = []
 filePath_List = []
