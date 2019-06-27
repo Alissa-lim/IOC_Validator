@@ -10,7 +10,7 @@ from nltk.corpus import wordnet
 
 keyTuple = ("HKLM:", "HKCU:", "**HKLM:", "**HKCU:")
 fileExtension = (".ps1", ".doc", ".js", ".vbs", ".Vbs",
-                    ".ps1_", ".doc_", ".js_", ".vbs_", ".Vbs_", ".py", ".exe")
+                    ".ps1_", ".doc_", ".js_", ".vbs_", ".Vbs_", ".py", ".exe", ".dll")
 REG_array = []
 fileName_List = []
 filePath_List = []
@@ -104,7 +104,7 @@ def running(link):
                 else:
                     domainName_List.append(split)
 
-    ip_candidates = re.findall(r"\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b",' '.join(filter_text))
+    ip_candidates = re.findall(r"\b\d{1,3}\[*\.\]*\d{1,3}\[*\.\]*\d{1,3}\[*\.\]*\d{1,3}\b",' '.join(filter_text))
     writeToFile(ip_candidates, ip_address)
     writeToFile(REG_array, REG_File)
     writeToFile(fileName_List, File_name)
