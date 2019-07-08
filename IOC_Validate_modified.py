@@ -1,9 +1,5 @@
 #!/usr/bin/env python
 # coding: utf-8
-
-# In[140]:
-
-
 import requests
 import re
 import socket
@@ -15,7 +11,7 @@ from lxml import html
 from nltk.corpus import wordnet
 
 
-# In[141]:
+
 
 
 def is_site_alive(url):
@@ -27,7 +23,7 @@ def is_site_alive(url):
         return False
 
 
-# In[142]:
+
 
 
 def is_domain(domain_name):
@@ -37,7 +33,7 @@ def is_domain(domain_name):
         return False
 
 
-# In[143]:
+
 
 
 def getContents(status):
@@ -49,7 +45,7 @@ def getContents(status):
     return filter_text
 
 
-# In[144]:
+
 
 
 def writeToFile(listTocheck, fileToWrite):
@@ -59,7 +55,7 @@ def writeToFile(listTocheck, fileToWrite):
             fileToWrite.write("%s\n" %(ip))
 
 
-# In[145]:
+
 
 
 def cleanCode(text):
@@ -73,7 +69,6 @@ def cleanCode(text):
     return filter_text
 
 
-# In[146]:
 
 
 def getIPAdr(filter_text):
@@ -81,7 +76,7 @@ def getIPAdr(filter_text):
     return ip_addr
 
 
-# In[147]:
+
 
 
 def getHash(split, hash_list):
@@ -92,7 +87,6 @@ def getHash(split, hash_list):
     return hash_list
 
 
-# In[148]:
 
 
 def checkFilePath(split, file_name, file_path):
@@ -106,7 +100,7 @@ def checkFilePath(split, file_name, file_path):
     return file_name, file_path
 
 
-# In[149]:
+
 
 
 def getDomain(split, domain_list, url_list):
@@ -117,7 +111,6 @@ def getDomain(split, domain_list, url_list):
     return domain_list, url_list
 
 
-# In[175]:
 
 
 def writeToFile(listTocheck, fileToWrite):
@@ -127,7 +120,7 @@ def writeToFile(listTocheck, fileToWrite):
             fileToWrite.write("%s\n" %(ip))
 
 
-# In[176]:
+
 
 
 def openFile():
@@ -141,7 +134,7 @@ def openFile():
     return Reg_file,File_name,File_path,Ip_address,Domain_name,Url_file,Hash_file
 
 
-# In[177]:
+
 
 
 def closeFile(Reg_file,File_name,File_path,Ip_address,Domain_name,Url_file,Hash_file):
@@ -154,7 +147,7 @@ def closeFile(Reg_file,File_name,File_path,Ip_address,Domain_name,Url_file,Hash_
     Hash_file.close()
 
 
-# In[182]:
+
 
 
 def writeAllToFile(instances):
@@ -169,7 +162,6 @@ def writeAllToFile(instances):
     closeFile(Reg_file,File_name,File_path,Ip_address,Domain_name,Url_file,Hash_file)
 
 
-# In[188]:
 
 
 def running(link):
@@ -198,8 +190,6 @@ def running(link):
     writeAllToFile(instances)
 
 
-# In[189]:
-
 
 def main():
     link = input("Plese input URL for crawling: ")
@@ -207,8 +197,6 @@ def main():
         link = "http://" + link
     running(link)
 
-
-# In[ ]:
 
 
 if __name__== "__main__":
