@@ -130,9 +130,6 @@ def openFile(folderName):
     return Reg_file,File_name,File_path,Ip_address,Domain_name,Url_file,MD5_file,SHA256_file,SHA512_file
 
 
-
-
-
 def closeFile(Reg_file,File_name,File_path,Ip_address,Domain_name,Url_file,MD5_file, SHA256_file, SHA512_file):
     Reg_file.close()
     File_name.close()
