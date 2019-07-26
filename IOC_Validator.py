@@ -144,10 +144,13 @@ def closeFile(Reg_file,File_name,File_path,Ip_address,Domain_name,Url_file,MD5_f
 
 
 def readURLFromText(textfile):
-    with open(textfile, "r") as TF:
-        for line in TF:
-            running(line)
-    print ("\nReading completed!")
+    if (os.path.exists(textfile)):
+        with open(textfile, "r") as TF:
+            for line in TF:
+                running(line)
+        print ("\nReading completed!")
+    else:
+        return False
 
 
 
@@ -209,7 +212,10 @@ def running(link):
 
 def main():
     link = input("Please input Location of text file: ")
-    readURLFromText(link)
+    fileExist = readURLFromText(link)
+    if fileExist == False:
+        print("Text file does not exist, please check!")
+    
 
 
 
