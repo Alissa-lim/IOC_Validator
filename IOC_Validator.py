@@ -32,9 +32,6 @@ def is_domain(domain_name):
         return False
 
 
-
-
-
 def getContents(status):
     soup = BeautifulSoup(status.content, features="lxml")
     # Splitting websites content by \n (line by line analysis)
@@ -48,12 +45,8 @@ def writeToFile(listTocheck, fileToWrite):
     if (len(listTocheck) > 0):
         listTocheck = list(dict.fromkeys(listTocheck))
         for ip in listTocheck:
-            ip = re.sub(r"\[.*?\]", ".", ip)
-            fileToWrite.write("%s\n" %(ip))
-
-
-
-
+            ip = re.sub(r"\[.*?\]", ".", ip) #Remove square brackets to standardize output
+            fileToWrite.write("%s\n" %(ip)) 
 
 def cleanCode(text):
     for ft in range(len(text)):
