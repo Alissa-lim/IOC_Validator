@@ -191,7 +191,7 @@ def running(link):
 
 
 def main():
-    link = input("Plese input URL for crawling: ")
+    link = input("Plese input URL of report: ")
     if  ("http://" not in link and "https://" not in link):
         link = "http://" + link
     running(link)
