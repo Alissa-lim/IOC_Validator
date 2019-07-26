@@ -7,9 +7,7 @@ import os
 from bs4 import BeautifulSoup
 from lxml import html
 from nltk.corpus import wordnet
-
-
-
+import shutil
 
 
 def is_site_alive(url):
@@ -17,6 +15,8 @@ def is_site_alive(url):
         status = requests.get(url)
         if status.status_code == 200:
             return status
+        else:
+            return False
     except:
         return False
 
@@ -121,15 +121,15 @@ def writeToFile(listTocheck, fileToWrite):
 
 
 
-def openFile():
+def openFile(folderName):
     script_dir = os.path.dirname(__file__)
-    Reg_file = open(os.path.join(script_dir,"IOCs/reg_key.txt"), "w+")
-    File_name = open(os.path.join(script_dir,"IOCs/fileName.txt"), "w+")
-    File_path = open(os.path.join(script_dir,"IOCs/filePath.txt"), "w+")
-    Ip_address = open(os.path.join(script_dir,"IOCs/ip_address.txt"), "w+")
-    Domain_name = open(os.path.join(script_dir,"IOCs/domain_name.txt"), "w+")
-    Url_file = open(os.path.join(script_dir,"IOCs/url.txt"), "w+")
-    Hash_file = open(os.path.join(script_dir,"IOCs/hash.txt"), "w+")
+    Reg_file = open(os.path.join(script_dir,folderName+"/IOCs/reg_key.txt"), "w+")
+    File_name = open(os.path.join(script_dir,folderName+"/IOCs/fileName.txt"), "w+")
+    File_path = open(os.path.join(script_dir,folderName+"/IOCs/filePath.txt"), "w+")
+    Ip_address = open(os.path.join(script_dir,folderName+"/IOCs/ip_address.txt"), "w+")
+    Domain_name = open(os.path.join(script_dir,folderName+"/IOCs/domain_name.txt"), "w+")
+    Url_file = open(os.path.join(script_dir,folderName+"/IOCs/url.txt"), "w+")
+    Hash_file = open(os.path.join(script_dir,folderName+"/IOCs/hash.txt"), "w+")
     return Reg_file,File_name,File_path,Ip_address,Domain_name,Url_file,Hash_file
 
 
@@ -146,11 +146,15 @@ def closeFile(Reg_file,File_name,File_path,Ip_address,Domain_name,Url_file,Hash_
     Hash_file.close()
 
 
+def readURLFromText(textfile):
+    with open(textfile, "r") as TF:
+        for line in TF:
+            running(line)
 
 
 
-def writeAllToFile(instances):
-    Reg_file,File_name,File_path,Ip_address,Domain_name,Url_file,Hash_file = openFile()
+def writeAllToFile(folderName,instances):
+    Reg_file,File_name,File_path,Ip_address,Domain_name,Url_file,Hash_file = openFile(folderName)
     writeToFile(instances['IP_Address'], Ip_address)
     writeToFile(instances['Registry_Keys'], Reg_file)
     writeToFile(instances['File_Name'], File_name)
@@ -172,6 +176,16 @@ def running(link):
     status = is_site_alive(link)
     if (status == False):
         return "Site URL not up"
+    splittedLink = link.rsplit('/', 1)
+    folderName = splittedLink[-1]
+    if folderName == "" or folderName == "\n":
+        splittedLink = link.rsplit('/', 2)
+        folderName = splittedLink[len(splittedLink)-2]
+    folderName = folderName.rstrip()
+    if os.path.exists(folderName):
+        shutil.rmtree(folderName)
+    os.mkdir(folderName)
+    os.mkdir(folderName + "/IOCs")
     text = getContents(status)
     filter_text = cleanCode(text)
     for filtered in filter_text:
@@ -186,15 +200,13 @@ def running(link):
             elif (not wordnet.synsets(split)) and ("http" not in split) and ("https" not in split):  
             	instances['Hashes']= getHash(split, instances['Hashes'])
     instances['IP_Address']= getIPAdr(filter_text)
-    writeAllToFile(instances)
+    writeAllToFile(folderName,instances)
 
 
 
 def main():
-    link = input("Plese input URL of report: ")
-    if  ("http://" not in link and "https://" not in link):
-        link = "http://" + link
-    running(link)
+    link = input("Plese input Location of text file: ")
+    readURLFromText(link)
 
 
 
