@@ -207,7 +207,7 @@ def running(link):
 
 
 def main():
-    link = input("Plese input Location of text file: ")
+    link = input("Please input Location of text file: ")
     readURLFromText(link)
 
 
