@@ -12,6 +12,7 @@ import shutil
 
 def is_site_alive(url):
     try:
+        url = url.rstrip()
         status = requests.get(url)
         if status.status_code == 200:
             return status
@@ -56,6 +57,7 @@ def writeToFile(listTocheck, fileToWrite):
     if (len(listTocheck) > 0):
         listTocheck = list(dict.fromkeys(listTocheck))
         for ip in listTocheck:
+            ip = re.sub(r"\[.*?\]", ".", ip)
             fileToWrite.write("%s\n" %(ip))
 
 
@@ -155,7 +157,7 @@ def readURLFromText(textfile):
 
 def writeAllToFile(folderName,instances):
     Reg_file,File_name,File_path,Ip_address,Domain_name,Url_file,Hash_file = openFile(folderName)
-    writeIPtoFile(instances['IP_Address'], Ip_address)
+    writeToFile(instances['IP_Address'], Ip_address)
     writeToFile(instances['Registry_Keys'], Reg_file)
     writeToFile(instances['File_Name'], File_name)
     writeToFile(instances['File_Path'], File_path)
