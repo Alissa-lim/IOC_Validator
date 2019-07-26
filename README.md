@@ -6,4 +6,4 @@ Validation of IOC reports
 `pip install requirements.txt`<br/>
 `python IOC_Validator.py`<br/>
 
-Then follow the instructions once the file is run.
+Then follow the instructions once the script is executed.
