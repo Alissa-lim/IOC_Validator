@@ -2,10 +2,7 @@
 # coding: utf-8
 import requests
 import re
-import socket
-import sys
 import validators
-import subprocess
 import os
 from bs4 import BeautifulSoup
 from lxml import html
