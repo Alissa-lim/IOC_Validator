@@ -157,7 +157,7 @@ def readURLFromText(textfile):
 
 def writeAllToFile(folderName,instances):
     Reg_file,File_name,File_path,Ip_address,Domain_name,Url_file,Hash_file = openFile(folderName)
-    writeToFile(instances['IP_Address'], Ip_address)
+    writeIPtoFile(instances['IP_Address'], Ip_address)
     writeToFile(instances['Registry_Keys'], Reg_file)
     writeToFile(instances['File_Name'], File_name)
     writeToFile(instances['File_Path'], File_path)
