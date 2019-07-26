@@ -48,7 +48,7 @@ def writeIPtoFile(listTocheck, fileToWrite):
     if (len(listTocheck) > 0):
         listTocheck = list(dict.fromkeys(listTocheck))
         for ip in listTocheck:
-            ip = re.sub(r"[[].*?[]]", ".", ip)
+            ip = re.sub(r"\[.*?\]", ".", ip)
             fileToWrite.write("%s\n" %(ip))
 
 
