@@ -1,0 +1,3 @@
+-type of hash: Done
+-uniform format 
+-site 404 error 

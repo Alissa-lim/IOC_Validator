@@ -85,12 +85,16 @@ def getIPAdr(filter_text):
 
 
 
-def getHash(split, hash_list):
+def getHash(split, hash_MD5, hash_SHA256, hash_SHA512):
     length_hash = [32, 64, 128]             
     if (re.match('^[a-zA-Z0-9]*$', split)): 
-        if(len(split) in length_hash): 
-            hash_list.append(split)   
-    return hash_list
+        if(len(split) == 32): 
+            hash_MD5.append(split)   
+        elif(len(split) == 64):
+            hash_SHA256.append(split)
+        elif(len(split) == 128):
+            hash_SHA512.append(split)
+    return hash_MD5, hash_SHA256, hash_SHA512
 
 
 
@@ -129,22 +133,26 @@ def openFile(folderName):
     Ip_address = open(os.path.join(script_dir,folderName+"/IOCs/ip_address.txt"), "w+")
     Domain_name = open(os.path.join(script_dir,folderName+"/IOCs/domain_name.txt"), "w+")
     Url_file = open(os.path.join(script_dir,folderName+"/IOCs/url.txt"), "w+")
-    Hash_file = open(os.path.join(script_dir,folderName+"/IOCs/hash.txt"), "w+")
-    return Reg_file,File_name,File_path,Ip_address,Domain_name,Url_file,Hash_file
+    MD5_file = open(os.path.join(script_dir,folderName+"/IOCs/md5.txt"), "w+")
+    SHA256_file = open(os.path.join(script_dir,folderName+"/IOCs/sha256.txt"), "w+")
+    SHA512_file = open(os.path.join(script_dir,folderName+"/IOCs/sha512.txt"), "w+")
+    return Reg_file,File_name,File_path,Ip_address,Domain_name,Url_file,MD5_file,SHA256_file,SHA512_file
 
 
 
 
 
-def closeFile(Reg_file,File_name,File_path,Ip_address,Domain_name,Url_file,Hash_file):
+def closeFile(Reg_file,File_name,File_path,Ip_address,Domain_name,Url_file,MD5_file, SHA256_file, SHA512_file):
     Reg_file.close()
     File_name.close()
     File_path.close()
     Ip_address.close()
     Domain_name.close()
     Url_file.close()
-    Hash_file.close()
-    
+    MD5_file.close()
+    SHA256_file.close()
+    SHA512_file.close()
+
 
 
 def readURLFromText(textfile):
@@ -156,21 +164,24 @@ def readURLFromText(textfile):
 
 
 def writeAllToFile(folderName,instances):
-    Reg_file,File_name,File_path,Ip_address,Domain_name,Url_file,Hash_file = openFile(folderName)
+    Reg_file,File_name,File_path,Ip_address,Domain_name,Url_file,MD5_file,SHA256_file,SHA512_file = openFile(folderName)
+    writeToFile(instances['IP_Address'], Ip_address)
     writeIPtoFile(instances['IP_Address'], Ip_address)
     writeToFile(instances['Registry_Keys'], Reg_file)
     writeToFile(instances['File_Name'], File_name)
     writeToFile(instances['File_Path'], File_path)
     writeToFile(instances['Urls'], Url_file)
     writeToFile(instances['Domain_Name'], Domain_name)
-    writeToFile(instances['Hashes'], Hash_file)
-    closeFile(Reg_file,File_name,File_path,Ip_address,Domain_name,Url_file,Hash_file)
+    writeToFile(instances['MD5'], MD5_file)
+    writeToFile(instances['SHA256'], SHA256_file)
+    writeToFile(instances['SHA512'], SHA512_file)
+    closeFile(Reg_file,File_name,File_path,Ip_address,Domain_name,Url_file,MD5_file,SHA256_file,SHA512_file)
 
 
 
 
 def running(link):
-    instances = {'Registry_Keys':[], 'File_Name': [], 'File_Path': [], 'Urls': [], 'Hashes': [], 'IP_Address': [], 'Domain_Name': []}
+    instances = {'Registry_Keys':[], 'File_Name': [], 'File_Path': [], 'Urls': [], 'MD5': [], 'SHA256': [], 'SHA512': [], 'IP_Address': [], 'Domain_Name': []}
     keyTuple = ("HKLM:", "HKCU:", "**HKLM:", "**HKCU:")
     fileExtension = (".ps1", ".doc", ".js", ".vbs", ".Vbs",
                     ".ps1_", ".doc_", ".js_", ".vbs_", ".Vbs_", ".py", ".exe", ".dll")
@@ -202,7 +213,7 @@ def running(link):
             elif (re.search(domain_reg, split.upper())):
                 instances['Domain_Name'], instances['Urls'] =  getDomain(split, instances['Domain_Name'], instances['Urls'])
             elif (not wordnet.synsets(split)) and ("http" not in split) and ("https" not in split):  
-            	instances['Hashes']= getHash(split, instances['Hashes'])
+            	instances['MD5'], instances['SHA256'], instances['SHA512'] = getHash(split, instances['MD5'], instances['SHA256'], instances['SHA512'])
     instances['IP_Address']= getIPAdr(filter_text)
     writeAllToFile(folderName,instances)
 
