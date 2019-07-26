@@ -35,7 +35,7 @@ def is_domain(domain_name):
 
 
 def getContents(status):
-    soup = BeautifulSoup(status.content)
+    soup = BeautifulSoup(status.content, features="lxml")
     # Splitting websites content by \n (line by line analysis)
     [s.extract() for s in soup('style')]  #Extracting CSS from contents
     [s.extract() for s in soup('script')] #Extracting Javascript from contents
@@ -44,6 +44,12 @@ def getContents(status):
 
 
 
+def writeIPtoFile(listTocheck, fileToWrite):
+    if (len(listTocheck) > 0):
+        listTocheck = list(dict.fromkeys(listTocheck))
+        for ip in listTocheck:
+            ip = re.sub(r"[[].*?[]]", ".", ip)
+            fileToWrite.write("%s\n" %(ip))
 
 
 def writeToFile(listTocheck, fileToWrite):
@@ -115,14 +121,6 @@ def getDomain(split, domain_list, url_list):
 
 
 
-def writeToFile(listTocheck, fileToWrite):
-    if (len(listTocheck) > 0):
-        listTocheck = list(dict.fromkeys(listTocheck))
-        for ip in listTocheck:
-            fileToWrite.write("%s\n" %(ip))
-
-
-
 
 
 def openFile(folderName):
@@ -154,16 +152,19 @@ def closeFile(Reg_file,File_name,File_path,Ip_address,Domain_name,Url_file,MD5_f
     SHA512_file.close()
 
 
+
 def readURLFromText(textfile):
     with open(textfile, "r") as TF:
         for line in TF:
             running(line)
+    print ("\nReading completed!")
 
 
 
 def writeAllToFile(folderName,instances):
     Reg_file,File_name,File_path,Ip_address,Domain_name,Url_file,MD5_file,SHA256_file,SHA512_file = openFile(folderName)
     writeToFile(instances['IP_Address'], Ip_address)
+    writeIPtoFile(instances['IP_Address'], Ip_address)
     writeToFile(instances['Registry_Keys'], Reg_file)
     writeToFile(instances['File_Name'], File_name)
     writeToFile(instances['File_Path'], File_path)
@@ -186,7 +187,7 @@ def running(link):
     status = is_site_alive(link)
     if (status == False):
         link = link.rstrip()
-        print(link + " not up and return 404 not found error\n")
+        print("\n" + link + " not avilable\n")
         return 
     splittedLink = link.rsplit('/', 1)
     folderName = splittedLink[-1]
