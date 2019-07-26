@@ -142,12 +142,14 @@ def closeFile(Reg_file,File_name,File_path,Ip_address,Domain_name,Url_file,Hash_
     Domain_name.close()
     Url_file.close()
     Hash_file.close()
+    
 
 
 def readURLFromText(textfile):
     with open(textfile, "r") as TF:
         for line in TF:
             running(line)
+    print ("\nReading completed!")
 
 
 
