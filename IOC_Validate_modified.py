@@ -6,6 +6,7 @@ import socket
 import sys
 import validators
 import subprocess
+import os
 from bs4 import BeautifulSoup
 from lxml import html
 from nltk.corpus import wordnet
@@ -124,13 +125,14 @@ def writeToFile(listTocheck, fileToWrite):
 
 
 def openFile():
-    Reg_file = open("reg_key.txt", "w+")
-    File_name = open("fileName.txt", "w+")
-    File_path = open("filePath.txt", "w+")
-    Ip_address = open("ip_address.txt", "w+")
-    Domain_name = open("domain_name.txt", "w+")
-    Url_file = open("url.txt", "w+")
-    Hash_file = open("hash.txt", "w+")
+    script_dir = os.path.dirname(__file__)
+    Reg_file = open(os.path.join(script_dir,"IOCs/reg_key.txt"), "w+")
+    File_name = open(os.path.join(script_dir,"IOCs/fileName.txt"), "w+")
+    File_path = open(os.path.join(script_dir,"IOCs/filePath.txt"), "w+")
+    Ip_address = open(os.path.join(script_dir,"IOCs/ip_address.txt"), "w+")
+    Domain_name = open(os.path.join(script_dir,"IOCs/domain_name.txt"), "w+")
+    Url_file = open(os.path.join(script_dir,"IOCs/url.txt"), "w+")
+    Hash_file = open(os.path.join(script_dir,"IOCs/hash.txt"), "w+")
     return Reg_file,File_name,File_path,Ip_address,Domain_name,Url_file,Hash_file
 
 
